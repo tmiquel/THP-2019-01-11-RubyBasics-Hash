@@ -52,7 +52,7 @@ def count_currencies_including(string_in_name, currencies_array, print=true)
 	end
 	selected_currencies=currencies_array.select {|word| word.include? string_in_name}
 	if print
-		puts "There are #{selected_currencies.length} currencies whose name includes #{string_in_name}"
+		puts "There are #{selected_currencies.length} currencies whose name includes #{string_in_name} (with this case)"
 		puts
 	end
 	return selected_currencies.length
@@ -60,8 +60,8 @@ end
 
 # Les devises, dont le cours est inférieur à 6000 (Indice : on peut comparer en valeur 2 integers mais pas 2 strings. Pense bien à enlever le $ et éventuellement utiliser .to_i pour faire cet exercice).
 
-def currencies_with_rate_below(max_value, hash,print=true)
-	if print
+def currencies_with_rate_below(max_value, hash,print_layout=true,print_list=false)
+	if print_layout
 		puts '=' * 80
 		puts ' ' * 5 + "CURRENCIE(S) WHOSE RATE IS BELOW #{max_value}" 
 		puts '=' * 80
@@ -70,15 +70,41 @@ def currencies_with_rate_below(max_value, hash,print=true)
 
 	selected_hash=hash.select {|k,v| v[1..-1].to_f < max_value}
 
-	if print
+	if print_layout
 		puts "There are #{selected_hash.length} currencies out of #{hash.length} whose rate is below #{max_value}."
 		puts
-		puts selected_hash 
+	end
+	if print_list
+		puts selected_hash.inspect	
+	elsif print_layout
+		puts "Liste limitée à 20 élements, mettre print_trigger = true pour imprimer toute la liste"
+		puts
+		puts selected_hash.to_a[0..20]
+	else
 	end
 	return selected_hash
 end
 
 # La devise la plus chère parmi celles dont le cours est inférieur à 6000.
+def most_expansive_currency_with_rate_below(max_value,hash,print_trigger=true)
+	if print_trigger
+		puts
+		puts '=' * 80
+		puts ' ' * 5 + "MOST EXPANSIVE CURRENCY AMONG THE ONES WHOSE RATE IS BELOW 6000" 
+		puts '=' * 80
+		puts
+	end
+
+	keys, value=keys_of_highest_value(currencies_with_rate_below( max_value, hash,print=false),print=false)
+	
+	if print_trigger
+		puts "The keys of highest value are #{keys.inspect} and the highest value is  #{value}"
+	end
+
+	return [keys, value]
+
+end
+
 
 def perform(currencies,rates)
 	rates_of_currencies = Hash[currencies.zip(rates)]
@@ -86,18 +112,10 @@ def perform(currencies,rates)
 	keys_of_highest_value(rates_of_currencies)
 	keys_of_lowest_value(rates_of_currencies)
 	count_currencies_including("coin",currencies)
-	currencies_with_rate_below(0.00001, rates_of_currencies)
-	puts
-	puts '=' * 80
-	puts ' ' * 5 + "MOST EXPANSIVE CURRENCY AMONG THE ONES WHOSE RATE IS BELOW 6000" 
-	puts '=' * 80
-	puts
-	keys, value=keys_of_highest_value(currencies_with_rate_below(6000, rates_of_currencies,print=false),print=false)
-	puts "The keys of highest value are #{keys.inspect} and the highest value is  #{value}"
+	currencies_with_rate_below(6000, rates_of_currencies, print_layout=true, print_list=false)
+	most_expansive_currency_with_rate_below(6000,rates_of_currencies,print_trigger=true)
 	# puts "contrôle #{a==rates_of_currencies}"
 end
-
-
 
 
 perform(currencies,rates)
